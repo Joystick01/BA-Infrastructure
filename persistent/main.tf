@@ -1,12 +1,7 @@
-resource "azurerm_resource_group" "rg-ba-kay-persistent" {
-  location = "West Europe"
-  name     = "rg-ba-kay-persistent"
-}
-
 resource "azurerm_storage_account" "sa-ba-kay-persistent" {
   name = "sabakaypersistent"
-  resource_group_name = azurerm_resource_group.rg-ba-kay-persistent.name
-    location = azurerm_resource_group.rg-ba-kay-persistent.location
+  resource_group_name = var.resource_group_name
+    location = var.location
     account_tier = "Standard"
     account_replication_type = "LRS"
 }

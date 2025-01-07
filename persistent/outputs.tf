@@ -3,7 +3,7 @@ output "STORAGE_ACCOUNT_URL" {
 }
 
 output "STORAGE_ACCOUNT_KEY" {
-  value = data.azurerm_storage_account_sas.sas-sa-ba-kay-persistent.sas
+  value = trimprefix(data.azurerm_storage_account_sas.sas-sa-ba-kay-persistent.sas, "?")
   sensitive = true
 }
 
