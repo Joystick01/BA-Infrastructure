@@ -1,5 +1,5 @@
 output "STORAGE_ACCOUNT_URL" {
-  value = azurerm_storage_account.sa-ba-kay-persistent.primary_dfs_endpoint
+  value = azurerm_storage_account.sa-ba-kay-datalake.primary_dfs_endpoint
 }
 
 output "STORAGE_ACCOUNT_KEY" {
@@ -8,5 +8,5 @@ output "STORAGE_ACCOUNT_KEY" {
 }
 
 output "STORAGE_FILESYSTEM_NAME" {
-  value = azurerm_storage_data_lake_gen2_filesystem.fs-sa-ba-kay-persistent.name
+  value = azurerm_storage_data_lake_gen2_filesystem.fs-sa-ba-kay-datalake.name
 }

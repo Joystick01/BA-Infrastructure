@@ -1,6 +1,6 @@
 .env
 
 .terraform*
-persistent/terraform.tfstate
+datalake/terraform.tfstate
 
 *.tfvars

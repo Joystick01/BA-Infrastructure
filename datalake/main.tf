@@ -1,18 +1,18 @@
-resource "azurerm_storage_account" "sa-ba-kay-persistent" {
-  name = "sabakaypersistent"
+resource "azurerm_storage_account" "sa-ba-kay-datalake" {
+  name = "sabakaydatalake"
   resource_group_name = var.resource_group_name
     location = var.location
     account_tier = "Standard"
     account_replication_type = "LRS"
 }
 
-resource "azurerm_storage_data_lake_gen2_filesystem" "fs-sa-ba-kay-persistent" {
-  name               = "fssabakaypersistent"
-  storage_account_id = azurerm_storage_account.sa-ba-kay-persistent.id
+resource "azurerm_storage_data_lake_gen2_filesystem" "fs-sa-ba-kay-datalake" {
+  name               = "fssabakaydatalake"
+  storage_account_id = azurerm_storage_account.sa-ba-kay-datalake.id
 }
 
 data "azurerm_storage_account_sas" "sas-sa-ba-kay-persistent" {
-    connection_string = azurerm_storage_account.sa-ba-kay-persistent.primary_connection_string
+    connection_string = azurerm_storage_account.sa-ba-kay-datalake.primary_connection_string
     resource_types {
         service   = true
         container = true
