@@ -1,11 +1,11 @@
-variable "DATALAKE_PAYLOAD_WRITER_ENDPOINT" {
-  type = string
+variable "VM_PASSWORD" {
+    type = string
 }
 
-variable "DATALAKE_PAYLOAD_WRITER_SAS_TOKEN" {
-  type = string
+variable "GATEWAY_PASSWORD" {
+    type = string
 }
 
-variable "DATALAKE_PAYLOAD_WRITER_FILESYSTEM" {
-  type = string
+variable "KAFKA_BOOTSTRAP_SERVERS" {
+    type = string
 }

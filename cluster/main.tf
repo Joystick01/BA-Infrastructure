@@ -1,3 +1,16 @@
+
+resource "azurerm_user_assigned_identity" "uai-hdi-kc-ba-kay" {
+  location            = var.location
+  name                = "uaihdikcbakay"
+  resource_group_name = var.resource_group_name
+}
+
+resource "azurerm_role_assignment" "ra-hdi-kc-ba-kay" {
+  scope = azurerm_storage_account.sa-hdi-kc-ba-kay.id
+  role_definition_name = "Storage Blob Data Owner"
+  principal_id = azurerm_user_assigned_identity.uai-hdi-kc-ba-kay.principal_id
+}
+
 resource "azurerm_storage_account" "sa-hdi-kc-ba-kay" {
   account_replication_type = "LRS"
   account_tier             = "Standard"
@@ -5,7 +18,10 @@ resource "azurerm_storage_account" "sa-hdi-kc-ba-kay" {
   name                     = "sahdikcbakay"
   resource_group_name      = var.resource_group_name
   identity {
-    type = "SystemAssigned"
+    type = "SystemAssigned, UserAssigned"
+    identity_ids = [
+        azurerm_user_assigned_identity.uai-hdi-kc-ba-kay.id
+    ]
   }
 }
 
@@ -14,6 +30,7 @@ resource "azurerm_storage_data_lake_gen2_filesystem" "fs-sa-hdi-kc-ba-kay" {
   storage_account_id = azurerm_storage_account.sa-hdi-kc-ba-kay.id
 }
 
+
 resource "azurerm_virtual_network" "vn-hdi-kc-ba-kay" {
   name = "vnhdikcbakay"
   location = var.location
@@ -21,11 +38,48 @@ resource "azurerm_virtual_network" "vn-hdi-kc-ba-kay" {
   address_space = ["10.0.0.0/16"]
 }
 
+resource "azurerm_network_security_group" "nsg-hdi-kc-ba-kay" {
+  location            = var.location
+  name                = "nsghdikcbakay"
+  resource_group_name = var.resource_group_name
+
+  security_rule {
+    name = "Allow-Inbound"
+    protocol = "*"
+    source_port_range = "*"
+    destination_port_range = "*"
+    source_address_prefix = "*"
+    destination_address_prefix = "*"
+    access = "Allow"
+    priority = 100
+    direction = "Inbound"
+  }
+
+  security_rule {
+    name = "Allow-Outbound"
+    protocol = "*"
+    source_port_range = "*"
+    destination_port_range = "*"
+    source_address_prefix = "*"
+    destination_address_prefix = "*"
+    access = "Allow"
+    priority = 100
+    direction = "Outbound"
+  }
+
+}
+
 resource "azurerm_subnet" "sn-hdi-kc-ba-kay" {
   name = "snhdikcbakay"
   resource_group_name = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.vn-hdi-kc-ba-kay.name
   address_prefixes = ["10.0.1.0/24"]
+  service_endpoints = ["Microsoft.Storage"]
+}
+
+resource "azurerm_subnet_network_security_group_association" "nsg-association-hdi-kc-ba-kay" {
+  subnet_id                 = azurerm_subnet.sn-hdi-kc-ba-kay.id
+  network_security_group_id = azurerm_network_security_group.nsg-hdi-kc-ba-kay.id
 }
 
 resource "azurerm_hdinsight_kafka_cluster" "hdi-kc-ba-kay" {
@@ -33,8 +87,9 @@ resource "azurerm_hdinsight_kafka_cluster" "hdi-kc-ba-kay" {
     resource_group_name = var.resource_group_name
     location = var.location
     cluster_version = "5.1"
+    tls_min_version = "1.2"
     component_version {
-        kafka = "3.2.0"
+        kafka = "3.2"
     }
     gateway {
       password = var.GATEWAY_PASSWORD
@@ -68,7 +123,7 @@ resource "azurerm_hdinsight_kafka_cluster" "hdi-kc-ba-kay" {
     storage_account_gen2 {
       filesystem_id                = azurerm_storage_data_lake_gen2_filesystem.fs-sa-hdi-kc-ba-kay.id
       is_default                   = true
-      managed_identity_resource_id = azurerm_storage_account.sa-hdi-kc-ba-kay.identity[0].identity_ids[0]
+      managed_identity_resource_id = azurerm_user_assigned_identity.uai-hdi-kc-ba-kay.id
       storage_resource_id          = azurerm_storage_account.sa-hdi-kc-ba-kay.id
     }
     tier = "Standard"
@@ -77,3 +132,4 @@ resource "azurerm_hdinsight_kafka_cluster" "hdi-kc-ba-kay" {
       primary_key                = var.LOG_ANALYTICS_WORKSPACE_PRIMARY_KEY
     }
 }
+
