@@ -3,6 +3,12 @@ resource "azurerm_subnet" "sn-ec-ba-kay" {
   name                 = "snecbakay"
   resource_group_name  = var.resource_group_name
   virtual_network_name = var.VIRTUAL_NETWORK_NAME
+  service_endpoints = ["Microsoft.Storage"]
+}
+
+resource "azurerm_subnet_network_security_group_association" "nsg-association-ec-ba-kay" {
+  network_security_group_id = var.NETWORK_SECURITY_GROUP_ID
+  subnet_id                 = azurerm_subnet.sn-ec-ba-kay.id
 }
 
 resource "azurerm_container_group" "cg-ec-ba-kay" {

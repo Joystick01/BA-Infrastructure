@@ -26,6 +26,10 @@ variable "DATALAKE_FILESYSTEM" {
     type = string
 }
 
+variable "NETWORK_SECURITY_GROUP_ID" {
+  type = string
+}
+
 variable "DATALAKE_PREFIX" {
     type = string
 }

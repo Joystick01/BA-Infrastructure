@@ -42,43 +42,75 @@ resource "azurerm_network_security_group" "nsg-hdi-kc-ba-kay" {
   location            = var.location
   name                = "nsghdikcbakay"
   resource_group_name = var.resource_group_name
-
-  security_rule {
-    name = "Allow-Inbound"
-    protocol = "*"
-    source_port_range = "*"
-    destination_port_range = "*"
-    source_address_prefix = "*"
-    destination_address_prefix = "*"
-    access = "Allow"
-    priority = 100
-    direction = "Inbound"
-  }
-
-  security_rule {
-    name = "Allow-Outbound"
-    protocol = "*"
-    source_port_range = "*"
-    destination_port_range = "*"
-    source_address_prefix = "*"
-    destination_address_prefix = "*"
-    access = "Allow"
-    priority = 100
-    direction = "Outbound"
-  }
-
 }
 
-resource "azurerm_subnet" "sn-hdi-kc-ba-kay" {
-  name = "snhdikcbakay"
+resource "azurerm_network_security_rule" "inb-nsg-rule-hdi-kc-ba-kay" {
+  access                     = "Allow"
+  destination_address_prefix = "*"
+  destination_port_range      = "*"
+  direction                  = "Inbound"
+  name                       = "inbnsgrulehdikcbakay"
+  network_security_group_name = azurerm_network_security_group.nsg-hdi-kc-ba-kay.name
+  priority                   = 110
+  protocol                   = "*"
+  source_address_prefix      = "*"
+  source_port_range          = "*"
+  resource_group_name = var.resource_group_name
+}
+
+resource "azurerm_network_security_rule" "out-nsg-rule-hdi-kc-ba-kay" {
+  access                     = "Allow"
+  destination_address_prefix = "*"
+  destination_port_range      = "*"
+  direction                  = "Outbound"
+  name                       = "outnsgrulehdikcbakay"
+  network_security_group_name = azurerm_network_security_group.nsg-hdi-kc-ba-kay.name
+  priority                   = 111
+  protocol                   = "*"
+  source_address_prefix      = "*"
+  source_port_range          = "*"
+  resource_group_name = var.resource_group_name
+}
+
+resource "azurerm_subnet" "sn1-hdi-kc-ba-kay" {
+  name = "sn1hdikcbakay"
   resource_group_name = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.vn-hdi-kc-ba-kay.name
   address_prefixes = ["10.0.1.0/24"]
   service_endpoints = ["Microsoft.Storage"]
+
 }
 
-resource "azurerm_subnet_network_security_group_association" "nsg-association-hdi-kc-ba-kay" {
-  subnet_id                 = azurerm_subnet.sn-hdi-kc-ba-kay.id
+resource "azurerm_subnet_network_security_group_association" "nsg1-association-hdi-kc-ba-kay" {
+  subnet_id                 = azurerm_subnet.sn1-hdi-kc-ba-kay.id
+  network_security_group_id = azurerm_network_security_group.nsg-hdi-kc-ba-kay.id
+}
+
+resource "azurerm_subnet" "sn2-hdi-kc-ba-kay" {
+  name = "sn2hdikcbakay"
+  resource_group_name = var.resource_group_name
+  virtual_network_name = azurerm_virtual_network.vn-hdi-kc-ba-kay.name
+  address_prefixes = ["10.0.2.0/24"]
+  service_endpoints = ["Microsoft.Storage"]
+
+}
+
+resource "azurerm_subnet_network_security_group_association" "nsg2-association-hdi-kc-ba-kay" {
+  subnet_id                 = azurerm_subnet.sn2-hdi-kc-ba-kay.id
+  network_security_group_id = azurerm_network_security_group.nsg-hdi-kc-ba-kay.id
+}
+
+resource "azurerm_subnet" "sn3-hdi-kc-ba-kay" {
+  name = "sn3hdikcbakay"
+  resource_group_name = var.resource_group_name
+  virtual_network_name = azurerm_virtual_network.vn-hdi-kc-ba-kay.name
+  address_prefixes = ["10.0.3.0/24"]
+  service_endpoints = ["Microsoft.Storage"]
+
+}
+
+resource "azurerm_subnet_network_security_group_association" "nsg3-association-hdi-kc-ba-kay" {
+  subnet_id                 = azurerm_subnet.sn3-hdi-kc-ba-kay.id
   network_security_group_id = azurerm_network_security_group.nsg-hdi-kc-ba-kay.id
 }
 
@@ -98,26 +130,26 @@ resource "azurerm_hdinsight_kafka_cluster" "hdi-kc-ba-kay" {
     roles {
       head_node {
         username = "kay_admin"
-        vm_size  = "Standard_D4a_V4"
+        vm_size  = "Standard_A4_V2"
         password = var.VM_PASSWORD
         virtual_network_id = azurerm_virtual_network.vn-hdi-kc-ba-kay.id
-        subnet_id = azurerm_subnet.sn-hdi-kc-ba-kay.id
+        subnet_id = azurerm_subnet.sn1-hdi-kc-ba-kay.id
       }
       zookeeper_node {
         username = "kay_admin"
-        vm_size  = "Standard_D4a_V4"
+        vm_size  = "Standard_A4_V2"
         password = var.VM_PASSWORD
         virtual_network_id = azurerm_virtual_network.vn-hdi-kc-ba-kay.id
-        subnet_id = azurerm_subnet.sn-hdi-kc-ba-kay.id
+        subnet_id = azurerm_subnet.sn2-hdi-kc-ba-kay.id
       }
       worker_node {
         number_of_disks_per_node = 1
         target_instance_count    = 3
         username                 = "kay_admin"
         password = var.VM_PASSWORD
-        vm_size                  = "Standard_D8a_V4"
+        vm_size                  = "Standard_A4_V2"
         virtual_network_id = azurerm_virtual_network.vn-hdi-kc-ba-kay.id
-        subnet_id = azurerm_subnet.sn-hdi-kc-ba-kay.id
+        subnet_id = azurerm_subnet.sn3-hdi-kc-ba-kay.id
       }
     }
     storage_account_gen2 {

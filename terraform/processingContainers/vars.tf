@@ -17,3 +17,7 @@ variable "KAFKA_BOOTSTRAP_SERVERS" {
 variable "KAFKA_SEND_RATE" {
     type = number
 }
+
+variable "NETWORK_SECURITY_GROUP_ID" {
+    type = string
+}
