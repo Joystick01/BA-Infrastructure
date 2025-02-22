@@ -28,11 +28,9 @@ spec:
       labels:
         app: simulator
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: aks-perf-25433128-vmss000003
       containers:
         - name: simulator
-          image: ghcr.io/joystick01/coolersimulator:0.1.4
+          image: ghcr.io/joystick01/coolersimulator:0.1.6
           resources:
             limits:
               cpu: "2"
@@ -54,9 +52,9 @@ spec:
                   name: kafka-connection-config
                   key: kafka_bootstrap_servers
             - name: KAFKA_PAYLOAD_WRITER_FLOOD_MESSAGES
-              value: "31449600" # Ersetze dies mit der berechneten Rate
+              value: "100" # Ersetze dies mit der berechneten Rate
             - name: KAFKA_PAYLOAD_WRITER_SEND_RATE
-              value: "52" # Ersetze dies mit deinem gewünschten Send Rate Wert
+              value: "10" # Ersetze dies mit deinem gewünschten Send Rate Wert
 
 ---
 apiVersion: apps/v1
@@ -74,11 +72,9 @@ spec:
       labels:
         app: processor
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: aks-perf-25433128-vmss000003      # Ersetze dies mit dem Namen des Nodes für den Prozessor
       containers:
         - name: processor
-          image: ghcr.io/joystick01/messageprocessingservice:0.1.1
+          image: ghcr.io/joystick01/messageprocessingservice:0.1.2
           env:
             - name: APPLICATION_ID_CONFIG
               value: "MessageProcessingService"

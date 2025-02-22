@@ -32,7 +32,7 @@ spec:
                   - key: metadata.name
                     operator: In
                     values:
-                      - minikube-m03  # Ersetzen Sie dies mit dem tatsächlichen Node-Namen
+                      - aks-perf-27904930-vmss000000  # Ersetzen Sie dies mit dem tatsächlichen Node-Namen
       containers:
         - name: kafka
           image: apache/kafka:3.9.0
@@ -66,12 +66,12 @@ spec:
   selector:
     app: kafka
     broker-id: "0"
+  type: ClusterIP
   ports:
     - name: plaintext
       port: 9092
     - name: controller
       port: 9093
-  clusterIP: None # Headless Service
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -101,7 +101,7 @@ spec:
                   - key: metadata.name
                     operator: In
                     values:
-                      - minikube-m02   # Ersetzen Sie dies mit dem tatsächlichen Node-Namen
+                      - aks-perf-27904930-vmss000001   # Ersetzen Sie dies mit dem tatsächlichen Node-Namen
       containers:
         - name: kafka
           image: apache/kafka:3.9.0
@@ -135,12 +135,12 @@ spec:
   selector:
     app: kafka
     broker-id: "1"
+  type: ClusterIP
   ports:
     - name: plaintext
       port: 9092
     - name: controller
       port: 9093
-  clusterIP: None # Headless Service
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -170,7 +170,7 @@ spec:
                   - key: metadata.name
                     operator: In
                     values:
-                      - minikube   # Ersetzen Sie dies mit dem tatsächlichen Node-Namen
+                      - aks-perf-27904930-vmss000002   # Ersetzen Sie dies mit dem tatsächlichen Node-Namen
       containers:
         - name: kafka
           image: apache/kafka:3.9.0
@@ -204,9 +204,9 @@ spec:
   selector:
     app: kafka
     broker-id: "2"
+  type: ClusterIP
   ports:
     - name: plaintext
       port: 9092
     - name: controller
       port: 9093
-  clusterIP: None # Headless Service

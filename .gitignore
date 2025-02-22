@@ -4,3 +4,7 @@
 datalake/terraform.tfstate
 
 *.tfvars
+*.tfstate
+*.tfstate.*
+
+.idea/

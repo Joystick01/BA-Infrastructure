@@ -1,0 +1,89 @@
+services:
+  kafka-0:
+    image: apache/kafka:3.9.0
+    environment:
+      KAFKA_PROCESS_ROLES: controller,broker
+      KAFKA_NODE_ID: "0"
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "0@kafka-0:9093,1@kafka-1:9093,2@kafka-2:9093"
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-0:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CLUSTER_ID: "my-kafka-cluster"
+      KAFKA_LOG_MESSAGE_TIMESTAMP_TYPE: 'LogAppendTime'
+    profiles:
+      - kafka
+  kafka-1:
+    image: apache/kafka:3.9.0
+    environment:
+      KAFKA_PROCESS_ROLES: controller,broker
+      KAFKA_NODE_ID: "1"
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "0@kafka-0:9093,1@kafka-1:9093,2@kafka-2:9093"
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-1:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CLUSTER_ID: "my-kafka-cluster"
+      KAFKA_LOG_MESSAGE_TIMESTAMP_TYPE: 'LogAppendTime'
+    profiles:
+      - kafka
+  kafka-2:
+    image: apache/kafka:3.9.0
+    environment:
+      KAFKA_PROCESS_ROLES: controller,broker
+      KAFKA_NODE_ID: "2"
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "0@kafka-0:9093,1@kafka-1:9093,2@kafka-2:9093"
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-2:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CLUSTER_ID: "my-kafka-cluster"
+      KAFKA_LOG_MESSAGE_TIMESTAMP_TYPE: 'LogAppendTime'
+    profiles:
+      - kafka
+
+  simulator:
+    image: ghcr.io/joystick01/coolersimulator:0.1.6
+    environment:
+      ERROR_RATE: "1000"
+      DUPLICATE_RATE: "1000"
+      PAYLOAD_WRITER_TYPE: "KAFKA"
+      PAYLOAD_WRITER_OFFSET: "0"
+      KAFKA_PAYLOAD_WRITER_TOPIC: "ingress"
+      KAFKA_PAYLOAD_WRITER_BOOTSTRAP_SERVERS: "kafka-0:9092,kafka-1:9092,kafka-2:9092"
+      KAFKA_PAYLOAD_WRITER_FLOOD_MESSAGES: "31449600"
+      KAFKA_PAYLOAD_WRITER_SEND_RATE: "122"
+    depends_on:
+      - kafka-0
+      - kafka-1
+      - kafka-2
+    profiles:
+      - benchmark
+  processor:
+    image: ghcr.io/joystick01/messageprocessingservice:0.1.2
+    environment:
+      BOOTSTRAP_SERVERS_CONFIG: "kafka-0:9092,kafka-1:9092,kafka-2:9092"
+      INPUT_TOPIC: "ingress"
+      OUTPUT_TOPIC: "egress"
+      APPLICATION_ID_CONFIG: "MessageProcessingService"
+    depends_on:
+      - kafka-0
+      - kafka-1
+      - kafka-2
+    profiles:
+      - benchmark
+
+  exporter:
+    image: ghcr.io/joystick01/kafkaexporter:0.1.6
+    environment:
+      WRITER_TYPE: "FILE"
+      FILEWRITER_PATH: "/out/high_v3"
+      FILEWRITER_FILE_MESSAGE_COUNT: "161290"
+      FILEWRITER_PADDING: "4"
+      KAFKA_TOPICS: "ingress,egress"
+      BOOTSTRAP_SERVERS_CONFIG: "kafka-0:9092,kafka-1:9092,kafka-2:9092"
+      MAX_POLL_RECORDS_CONFIG: "200000"
+    volumes:
+      - /media/kakn/storage/message_export:/out
+    profiles:
+      - export

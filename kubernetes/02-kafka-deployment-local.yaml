@@ -32,7 +32,7 @@ spec:
                   - key: metadata.name
                     operator: In
                     values:
-                      - aks-perf-76351988-vmss000000  # Ersetzen Sie dies mit dem tatsächlichen Node-Namen
+                      - minikube-m03   # Ersetzen Sie dies mit dem tatsächlichen Node-Namen
       containers:
         - name: kafka
           image: apache/kafka:3.9.0
@@ -101,7 +101,7 @@ spec:
                   - key: metadata.name
                     operator: In
                     values:
-                      - aks-perf-76351988-vmss000001   # Ersetzen Sie dies mit dem tatsächlichen Node-Namen
+                      - minikube-m02   # Ersetzen Sie dies mit dem tatsächlichen Node-Namen
       containers:
         - name: kafka
           image: apache/kafka:3.9.0
@@ -170,7 +170,7 @@ spec:
                   - key: metadata.name
                     operator: In
                     values:
-                      - aks-perf-76351988-vmss000002   # Ersetzen Sie dies mit dem tatsächlichen Node-Namen
+                      - minikube   # Ersetzen Sie dies mit dem tatsächlichen Node-Namen
       containers:
         - name: kafka
           image: apache/kafka:3.9.0

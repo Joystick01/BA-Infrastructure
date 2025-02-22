@@ -10,7 +10,7 @@ metadata:
   name: kafka-connection-config
   namespace: processing
 data:
-  kafka_bootstrap_servers: "kafka-broker-0.kafka-cluster.svc.cluster.local:9092" # Ersetze dies mit deiner tatsächlichen Kafka-Verbindungszeichenkette
+  kafka_bootstrap_servers: "kafka-broker-0.kafka-cluster.svc.cluster.local:9092,kafka-broker-1.kafka-cluster.svc.cluster.local:9092,kafka-broker-2.kafka-cluster.svc.cluster.local:9092" # Ersetze dies mit deiner tatsächlichen Kafka-Verbindungszeichenkette
 
 ---
 apiVersion: apps/v1
@@ -29,14 +29,11 @@ spec:
         app: simulator
     spec:
       nodeSelector:
-        kubernetes.io/hostname: minikube-m03
+        kubernetes.io/hostname: aks-perf-27904930-vmss000003
       containers:
         - name: simulator
-          image: ghcr.io/joystick01/coolersimulator:0.1.3
+          image: ghcr.io/joystick01/coolersimulator:0.1.6
           resources:
-            requests:
-              cpu: "1"
-              memory: "2Gi"
             limits:
               cpu: "2"
               memory: "8Gi"
@@ -57,9 +54,9 @@ spec:
                   name: kafka-connection-config
                   key: kafka_bootstrap_servers
             - name: KAFKA_PAYLOAD_WRITER_FLOOD_MESSAGES
-              value: "10" # Ersetze dies mit der berechneten Rate
+              value: "31449600" # Ersetze dies mit der berechneten Rate
             - name: KAFKA_PAYLOAD_WRITER_SEND_RATE
-              value: "10" # Ersetze dies mit deinem gewünschten Send Rate Wert
+              value: "52" # Ersetze dies mit deinem gewünschten Send Rate Wert
 
 ---
 apiVersion: apps/v1
@@ -78,17 +75,10 @@ spec:
         app: processor
     spec:
       nodeSelector:
-        kubernetes.io/hostname: "minikube-m03" # Ersetze dies mit dem Namen des Nodes für den Prozessor
+        kubernetes.io/hostname: aks-perf-27904930-vmss000003      # Ersetze dies mit dem Namen des Nodes für den Prozessor
       containers:
         - name: processor
-          image: ghcr.io/joystick01/messageprocessingservice:0.1.0
-          resources:
-            requests:
-              cpu: "1"
-              memory: "4Gi"
-            limits:
-              cpu: "4"
-              memory: "16Gi"
+          image: ghcr.io/joystick01/messageprocessingservice:0.1.2
           env:
             - name: APPLICATION_ID_CONFIG
               value: "MessageProcessingService"
